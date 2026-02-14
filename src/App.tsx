@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import FooterPro from "./components/FooterPro";
+import { motion, AnimatePresence } from "framer-motion";
 
-const DEMO_WHATSAPP_NUMBER = "919036692164"; // replace later (no +)
+
+const DEMO_WHATSAPP_NUMBER = "919036692164"; // no +
 
 const CARS = [
   {
@@ -65,35 +68,25 @@ const CARS = [
   },
 ];
 
-interface Car {
-  id: string;
-  name: string;
-  pricePerDay: number;
-  seats: number;
-  fuel: string;
-  transmission: string;
-  tag: string;
-  img: string;
-}
+type Car = (typeof CARS)[number];
 
- 
-
-function formatINR(n :number) {
+function formatINR(n: number) {
   return `₹${Number(n).toLocaleString("en-IN")}`;
 }
-function daysBetween(start :string | number, end :string | number) {
+function daysBetween(start: string, end: string) {
   const s = new Date(start);
   const e = new Date(end);
-  const ms : number = e.getTime() - s.getTime();
+  const ms = e.getTime() - s.getTime();
   const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
   return isFinite(days) ? Math.max(days, 0) : 0;
 }
-function clampPhone10(s :string) {
+function clampPhone10(s: string) {    
   return (s || "").replace(/\D/g, "").slice(0, 10);
 }
 
 export default function App() {
   const [selectedCarId, setSelectedCarId] = useState(CARS[0].id);
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -120,35 +113,28 @@ export default function App() {
     return rentalDays * selectedCar.pricePerDay;
   }, [rentalDays, selectedCar.pricePerDay]);
 
-  const scrollTo = (id :string) => {
+  const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-const onChange =
-  (key: string) =>
-  (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const val =
-      key === "phone"
-        ? clampPhone10(e.target.value)
-        : e.target.value;
-
-    setForm((p) => ({ ...p, [key]: val }));
-  };
-
+  const onChange =
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = key === "phone" ? clampPhone10(e.target.value) : e.target.value;
+      setForm((p) => ({ ...p, [key]: value }));
+    };
 
   const validate = () => {
     if (!form.name.trim()) return "Please enter your name";
-    if (!/^\d{10}$/.test(form.phone.trim()))
-      return "Please enter a valid 10-digit phone number";
+    if (!/^\d{10}$/.test(form.phone.trim())) return "Please enter a valid 10-digit phone number";
     if (!form.pickupDate) return "Please select pickup date";
     if (!form.dropDate) return "Please select drop date";
-    if (new Date(form.dropDate) <= new Date(form.pickupDate))
-      return "Drop date must be after pickup date";
+    if (new Date(form.dropDate) <= new Date(form.pickupDate)) return "Drop date must be after pickup date";
     if (!form.pickupLocation.trim()) return "Please enter pickup location";
     return null;
   };
 
-  const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const err = validate();
     if (err) return alert(err);
@@ -167,23 +153,20 @@ const onChange =
     ].filter(Boolean);
 
     const text = encodeURIComponent(msgLines.join("\n"));
-    window.open(
-      `https://wa.me/${DEMO_WHATSAPP_NUMBER}?text=${text}`,
-      "_blank"
-    );
+    window.open(`https://wa.me/${DEMO_WHATSAPP_NUMBER}?text=${text}`, "_blank");
   };
 
-  const bookThisCar = (carId :string) => {
+  const bookThisCar = (carId: string) => {
     setSelectedCarId(carId);
     scrollTo("booking");
   };
 
   return (
-    <div style={S.page}>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 text-slate-900">
       <Topbar onCars={() => scrollTo("cars")} onBook={() => scrollTo("booking")} />
 
       <Hero
-        car ={selectedCar}
+        selectedCar={selectedCar}
         carId={selectedCarId}
         setCarId={setSelectedCarId}
         pickupDate={form.pickupDate}
@@ -196,43 +179,55 @@ const onChange =
         onBook={() => scrollTo("booking")}
       />
 
-      <section id="cars" style={S.section}>
-        <div style={S.sectionHead}>
-          <h2 style={S.h2}>Available Cars</h2>
-          <p style={S.muted}>
+      {/* Cars */}
+      <section id="cars" className="px-4 py-12">
+        <div className="max-w-7xl mx-auto mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Available Cars</h2>
+          <p className="text-slate-600 mt-2">
             Demo listings. We’ll replace with your real cars, pricing & photos.
           </p>
         </div>
 
-        <div className="cars-grid" style={{ maxWidth: 1120, margin: "0 auto" }}>
+        {/* ✅ lg=3 columns */}
+        <div className="max-w-7xl mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CARS.map((car) => (
             <div
               key={car.id}
-              style={S.card}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0px)")}
+              className="group rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-xl transition"
             >
-              <div style={S.cardImgWrap}>
-                <img src={car.img} alt={car.name} style={S.cardImg} loading="lazy" />
-                <div style={S.badge}>{car.tag}</div>
+              <div className="relative h-48 bg-slate-100 overflow-hidden">
+                <img
+                  src={car.img}
+                  alt={car.name}
+                  className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-300"
+                  loading="lazy"
+                />
+                <span className="absolute left-3 top-3 text-xs font-extrabold px-3 py-1 rounded-full text-white
+                  bg-gradient-to-r from-sky-500 to-indigo-500 shadow">
+                  {car.tag}
+                </span>
               </div>
 
-              <div style={S.cardBody}>
-                <div style={S.cardTopRow}>
-                  <div style={S.carName}>{car.name}</div>
-                  <div style={S.price}>
-                    {formatINR(car.pricePerDay)}{" "}
-                    <span style={S.perDay}>/day</span>
+              <div className="p-4 grid gap-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-extrabold">{car.name}</div>
+                  <div className="font-extrabold">
+                    {formatINR(car.pricePerDay)} <span className="text-xs text-slate-500">/day</span>
                   </div>
                 </div>
 
-                <div style={S.meta}>
+                <div className="flex flex-wrap gap-3 text-sm text-slate-700">
                   <span>👤 {car.seats} Seats</span>
                   <span>⛽ {car.fuel}</span>
                   <span>⚙️ {car.transmission}</span>
                 </div>
 
-                <button style={S.primaryBtn} onClick={() => bookThisCar(car.id)}>
+                <button
+                  onClick={() => bookThisCar(car.id)}
+                  className="w-full rounded-xl px-4 py-3 font-extrabold text-white
+                    bg-gradient-to-r from-sky-500 to-indigo-500
+                    hover:opacity-95 active:scale-[0.99] transition shadow-md"
+                >
                   Book this car →
                 </button>
               </div>
@@ -241,42 +236,45 @@ const onChange =
         </div>
       </section>
 
-      <section style={{ ...S.section, paddingTop: 0 }}>
-        <div style={S.sectionHead}>
-          <h2 style={S.h2}>How it works</h2>
-          <p style={S.muted}>Fast booking, instant WhatsApp confirmation.</p>
+      {/* How it works */}
+      <section id="how" className="px-4 pb-4">
+        <div className="max-w-7xl mx-auto mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">How it works</h2>
+          <p className="text-slate-600 mt-2">Fast booking, instant WhatsApp confirmation.</p>
         </div>
 
-        <div style={S.steps}>
+        <div className="max-w-7xl mx-auto grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { n: "01", t: "Choose a car", d: "Pick the car that fits your trip and budget." },
             { n: "02", t: "Fill booking details", d: "Pickup, drop dates and your location." },
             { n: "03", t: "WhatsApp confirmation", d: "We receive your request instantly on WhatsApp." },
             { n: "04", t: "Pickup & drive", d: "Complete verification and enjoy your ride." },
           ].map((s) => (
-            <div key={s.n} style={S.stepCard}>
-              <div style={S.stepN}>{s.n}</div>
-              <div style={S.stepT}>{s.t}</div>
-              <div style={S.stepD}>{s.d}</div>
+            <div key={s.n} className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 hover:shadow-lg transition">
+              <div className="text-slate-500 font-extrabold">{s.n}</div>
+              <div className="mt-2 font-extrabold">{s.t}</div>
+              <div className="mt-2 text-sm text-slate-600 leading-relaxed">{s.d}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section id="booking" style={S.section}>
-        <div style={S.sectionHead}>
-          <h2 style={S.h2}>Booking Request</h2>
-          <p style={S.muted}>
-            Submit → it will open WhatsApp with all booking details.
-          </p>
+      {/* Booking */}
+      <section id="booking" className="px-4 py-12">
+        <div className="max-w-7xl mx-auto mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Booking Request</h2>
+          <p className="text-slate-600 mt-2">Submit → it will open WhatsApp with all booking details.</p>
         </div>
 
-        <div style={S.bookingWrap}>
-          <form style={S.form} onSubmit={handleSubmit}>
-            <div style={S.row2}>
+        <div className="max-w-7xl mx-auto grid gap-5 lg:grid-cols-[1fr_0.42fr] items-start">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl bg-white border border-slate-200 shadow-sm p-5 grid gap-4"
+          >
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Full Name">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   placeholder="Your name"
                   value={form.name}
                   onChange={onChange("name")}
@@ -284,7 +282,7 @@ const onChange =
               </Field>
               <Field label="Phone (10 digits)">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   placeholder="9876543210"
                   inputMode="numeric"
                   value={form.phone}
@@ -295,7 +293,7 @@ const onChange =
 
             <Field label="Select Car">
               <select
-                style={S.input}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                 value={selectedCarId}
                 onChange={(e) => setSelectedCarId(e.target.value)}
               >
@@ -307,10 +305,10 @@ const onChange =
               </select>
             </Field>
 
-            <div style={S.row2}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Pickup Date">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   type="date"
                   value={form.pickupDate}
                   onChange={onChange("pickupDate")}
@@ -318,7 +316,7 @@ const onChange =
               </Field>
               <Field label="Pickup Time">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   type="time"
                   value={form.pickupTime}
                   onChange={onChange("pickupTime")}
@@ -326,10 +324,10 @@ const onChange =
               </Field>
             </div>
 
-            <div style={S.row2}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Drop Date">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   type="date"
                   value={form.dropDate}
                   onChange={onChange("dropDate")}
@@ -337,7 +335,7 @@ const onChange =
               </Field>
               <Field label="Drop Time">
                 <input
-                  style={S.input}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                   type="time"
                   value={form.dropTime}
                   onChange={onChange("dropTime")}
@@ -347,7 +345,7 @@ const onChange =
 
             <Field label="Pickup Location">
               <input
-                style={S.input}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                 placeholder="e.g., Airport / Railway Station / City"
                 value={form.pickupLocation}
                 onChange={onChange("pickupLocation")}
@@ -356,58 +354,50 @@ const onChange =
 
             <Field label="Notes (optional)">
               <textarea
-                style={{ ...S.input, minHeight: 90, resize: "vertical" }}
+                className="w-full min-h-[90px] rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
                 placeholder="Any special request?"
                 value={form.note}
                 onChange={onChange("note")}
               />
             </Field>
 
-            <div style={S.formFooter}>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div>
-                <div style={S.total}>
-                  Estimated Total:{" "}
-                  <strong>{estTotal ? formatINR(estTotal) : "-"}</strong>
+                <div className="text-sm text-slate-700">
+                  Estimated Total: <b>{estTotal ? formatINR(estTotal) : "-"}</b>
                 </div>
-                <div style={S.small}>(Estimate: days × price/day)</div>
+                <div className="text-xs text-slate-500 mt-1">(Estimate: days × price/day)</div>
               </div>
 
-              <button type="submit" style={S.primaryBtnLg}>
+              <button
+                type="submit"
+                className="rounded-xl px-5 py-3 font-extrabold text-white
+                  bg-gradient-to-r from-sky-500 to-indigo-500
+                  hover:opacity-95 active:scale-[0.99] transition shadow-md"
+              >
                 Submit on WhatsApp
               </button>
             </div>
           </form>
 
-          <aside style={S.aside}>
-            <div style={S.asideCard}>
-              <div style={S.asideTitle}>Service Area</div>
-              <div style={S.asideText}>Delhi NCR (Demo)</div>
-            </div>
-            <div style={S.asideCard}>
-              <div style={S.asideTitle}>Documents</div>
-              <div style={S.asideText}>Driving License + ID Proof</div>
-            </div>
-            <div style={S.asideCard}>
-              <div style={S.asideTitle}>Instant Support</div>
-              <div style={S.asideText}>
-                Call / WhatsApp buttons will be added with the real number.
-              </div>
-            </div>
+          <aside className="grid gap-4">
+            <InfoCard title="Service Area" text="Delhi NCR (Demo)" />
+            <InfoCard title="Documents" text="Driving License + ID Proof" />
+            <InfoCard title="Instant Support" text="WhatsApp & Call buttons available on screen." />
           </aside>
         </div>
       </section>
 
-      <footer style={S.footer}>
-        <div style={S.footerInner}>
-          <div>
-            <div style={S.footerTitle}>Nehra Car Rental</div>
-            <div style={S.footerText}>
-              Demo website for preview • Replace with real cars, pricing & images.
-            </div>
-          </div>
-          <div style={S.footerText}>Built by AISHI Technologies</div>
-        </div>
-      </footer>
+      {/* ✅ Light Footer component */}
+      <FooterPro
+        brandName="Nehra Car Rental"
+        phone="+91 99999 99999"
+        whatsappNumber={DEMO_WHATSAPP_NUMBER}
+        email="info@nehracarrental.com"
+        locationText="Delhi NCR"
+        mapEmbedSrc="https://www.google.com/maps?q=Delhi%20NCR&output=embed"
+     
+      />
     </div>
   );
 }
@@ -416,505 +406,162 @@ const onChange =
 
 function Topbar({ onCars, onBook }: { onCars: () => void; onBook: () => void }) {
   return (
-    <header style={S.topbar}>
-      <div style={S.brand}>
-        <img
-          src="/logo.png"
-          alt="Nehra Car Rental Logo"
-          style={{ height: "44px", width: "auto", borderRadius: 10 }}
-        />
-        <div>
-          <div style={S.brandName}>Nehra Car Rental</div>
-          <div style={S.brandTag}>Self Drive • Instant Booking</div>
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="h-11 w-auto rounded-xl" />
+          <div>
+            <div className="font-extrabold">Nehra Car Rental</div>
+            <div className="text-xs text-slate-600">Self Drive • Instant Booking</div>
+          </div>
         </div>
-      </div>
-      <div style={S.actions}>
-        <button style={S.secondaryBtn} onClick={onCars}>
-          View Cars
-        </button>
-        <button style={S.primaryBtnSm} onClick={onBook}>
-          Book Now
-        </button>
+
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={onCars}
+            className="rounded-xl px-4 py-2 font-bold border border-slate-200 bg-white hover:bg-slate-50 transition"
+          >
+            View Cars
+          </button>
+          <button
+            onClick={onBook}
+            className="rounded-xl px-4 py-2 font-extrabold text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:opacity-95 transition"
+          >
+            Book Now
+          </button>
+        </div>
       </div>
     </header>
   );
 }
-
-function Hero({ car, carId, setCarId, pickupDate, dropDate, setPickup, setDrop, rentalDays, estTotal, onExplore, onBook }: {
-  car :Car,
-  carId :string,
-  setCarId :(v :string) => void   ,
-  pickupDate :string,
-  dropDate :string,
-  setPickup :(v :string) => void,
-  setDrop :(v :string) => void,
-  rentalDays :number | null,
-  estTotal :number | null,
-  onExplore :() => void,
-  onBook :() => void,
-})  
-{
+function Hero({
+ 
+  onExplore,
+  onBook,
+}: {
+  selectedCar: Car;
+  carId: string;
+  setCarId: (v: string) => void;
+  pickupDate: string;
+  dropDate: string;
+  setPickup: (v: string) => void;
+  setDrop: (v: string) => void;
+  rentalDays: number;
+  estTotal: number;
+  onExplore: () => void;
+  onBook: () => void;
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentIndex((prev) => (prev + 1) % CARS.length);
-  }, 3000); // change every 3 seconds
+  useEffect(() => {
+    const it = setInterval(() => {
+      setCurrentIndex((p) => (p + 1) % CARS.length);
+    }, 4000);
+    return () => clearInterval(it);
+  }, []);
 
-  return () => clearInterval(interval);
-}, []);
+  const slide = CARS[currentIndex];
 
   return (
-    <section style={S.hero}>
-      <div style={S.heroInner}>
-        <div>
-          <div style={S.pill}>🚗 Self Drive Car Rentals</div>
+    <section className="relative px-4 pt-12 pb-10 overflow-hidden">
+      
+      {/* Background Glow */}
+      <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-indigo-400/20 blur-[120px] rounded-full" />
+      <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-sky-400/20 blur-[120px] rounded-full" />
 
-          <h1 style={S.h1}>
-            Self Drive car rentals in{" "}
-            <span style={S.gradText}>Delhi NCR</span>
-            <br />
-            <span style={S.h1Sub}>Starting from just ₹1299/day</span>
+      <div className="max-w-7xl mx-auto grid gap-10 lg:grid-cols-2 items-center relative z-10">
+
+        {/* Left Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur border border-slate-200 shadow-sm text-sm font-semibold">
+            🚗 Self Drive Car Rentals
+          </div>
+
+          <h1 className="mt-6 text-[clamp(32px,4vw,48px)] font-extrabold leading-tight tracking-tight">
+            Premium Car Rentals in{" "}
+            <span className="bg-gradient-to-r from-sky-500 to-indigo-600 bg-clip-text text-transparent">
+              Delhi NCR
+            </span>
           </h1>
 
-          <p style={S.sub}>
-            Clean cars, transparent pricing, and instant WhatsApp confirmation.
-            Perfect for trips, weekends, and daily needs.
+          <p className="mt-4 text-slate-600 text-lg leading-relaxed max-w-xl">
+            Experience seamless self-drive booking with transparent pricing
+            and instant WhatsApp confirmation.
           </p>
 
-          <div style={S.heroBtns}>
-            <button style={S.primaryBtnLg} onClick={onExplore}>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <button
+              onClick={onExplore}
+              className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-indigo-600 shadow-lg hover:scale-105 transition"
+            >
               Explore Cars
             </button>
-            <button style={S.secondaryBtn} onClick={onBook}>
-              Book on WhatsApp
+
+            <button
+              onClick={onBook}
+              className="px-6 py-3 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-50 transition"
+            >
+              Book Now
             </button>
           </div>
+        </motion.div>
 
-          <div style={S.trust}>
-            <div style={S.trustItem}>✅ Verified listings</div>
-            <div style={S.trustItem}>✅ Quick booking</div>
-            <div style={S.trustItem}>✅ Flexible pickup</div>
-          </div>
-        </div>
+        {/* Right Slider */}
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-white/40 backdrop-blur-xl">
 
-        <div style={S.heroCard}>
-          <div style={S.heroCardHead}>
-            <div style={S.heroCardTitle}>Quick Estimate</div>
-            <div style={S.heroCardSub}>Select car + dates</div>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={slide.id}
+              src={slide.img}
+              alt={slide.name}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              className="w-full h-[320px] md:h-[420px] object-cover"
+            />
+          </AnimatePresence>
 
-          <div style={S.heroCardBody}>
-            <Field label="Car">
-              <select
-                style={S.input}
-                value={carId}
-                onChange={(e) => setCarId(e.target.value)}
-              >
-                {CARS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} • {formatINR(c.pricePerDay)}/day
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <div style={S.row2}>
-              <Field label="Pickup Date">
-                <input
-                  style={S.input}
-                  type="date"
-                  value={pickupDate}
-                  onChange={(e) => setPickup(e.target.value)}
-                />
-              </Field>
-              <Field label="Drop Date">
-                <input
-                  style={S.input}
-                  type="date"
-                  value={dropDate}
-                  onChange={(e) => setDrop(e.target.value)}
-                />
-              </Field>
+          {/* Glass Overlay Info */}
+          <motion.div
+            key={slide.id + "info"}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute bottom-6 left-6 bg-white/70 backdrop-blur-lg border border-slate-200 rounded-2xl px-5 py-4 shadow-lg"
+          >
+            <div className="text-xl font-bold">{slide.name}</div>
+            <div className="text-sm text-slate-600 mt-1">
+              {formatINR(slide.pricePerDay)}/day • {slide.seats} seats •{" "}
+              {slide.transmission}
             </div>
-
-            <div style={S.estimate}>
-              <div style={S.estimateRow}>
-                <span>Selected</span>
-                <strong>{car.name}</strong>
-              </div>
-              <div style={S.estimateRow}>
-                <span>Days</span>
-                <strong>{rentalDays || "-"}</strong>
-              </div>
-              <div style={S.estimateRow}>
-                <span>Estimate</span>
-                <strong>{estTotal ? formatINR(estTotal) : "-"}</strong>
-              </div>
-              <div style={S.small}>
-                Final price may vary based on availability & policy.
-              </div>
-            </div>
-
-            <button style={S.primaryBtnLg} onClick={onBook}>
-              Continue to Booking →
-            </button>
-          </div>
+          </motion.div>
         </div>
       </div>
-
-      <div style={S.heroImageStrip}>
-  <img
-    src={CARS[currentIndex].img}
-    alt={CARS[currentIndex].name}
-    style={{
-      ...S.heroImg,
-      transition: "opacity 0.6s ease-in-out",
-    }}
-  />
-
-  <div style={S.heroOverlay}>
-    <div style={S.overlayTitle}>
-      {CARS[currentIndex].name}
-    </div>
-    <div style={S.overlaySub}>
-      {formatINR(CARS[currentIndex].pricePerDay)}/day •{" "}
-      {CARS[currentIndex].seats} seats •{" "}
-      {CARS[currentIndex].transmission}
-    </div>
-  </div>
-</div>
-
     </section>
   );
 }
 
-function Field({ label, children } : { label :string, children :React.ReactNode }) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div style={S.label}>{label}</div>
+      <div className="text-xs font-bold text-slate-600 mb-2">{label}</div>
       {children}
     </div>
   );
 }
 
-/* ---------- Styles (Responsive) ---------- */
-
-const S = {
-  page: {
-    fontFamily:
-      "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
-    background: "linear-gradient(180deg, #F7FAFF 0%, #FFFFFF 40%, #F6F8FC 100%)",
-    color: "#0B1220",
-    minHeight: "100vh",
-  },
-
-  topbar: {
-    position: "sticky",
-    top: 0,
-    zIndex: 20,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    padding: "12px 16px",
-    background: "rgba(255,255,255,0.85)",
-    backdropFilter: "blur(10px)",
-    borderBottom: "1px solid rgba(15, 23, 42, 0.08)",
-    flexWrap: "wrap",
-  },
-  brand: { display: "flex", alignItems: "center", gap: 12 },
-  brandName: { fontWeight: 900, letterSpacing: 0.2 },
-  brandTag: { fontSize: 12, color: "rgba(15,23,42,0.6)", marginTop: 2 },
-
-  actions: { display: "flex", gap: 10, flexWrap: "wrap" },
-
-  hero: { padding: "26px 16px 12px" },
-  heroInner: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: 16,
-    alignItems: "start",
-  },
-  pill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "7px 12px",
-    borderRadius: 999,
-    border: "1px solid rgba(15,23,42,0.08)",
-    background: "rgba(255,255,255,0.7)",
-    boxShadow: "0 10px 22px rgba(15,23,42,0.06)",
-    fontSize: 13,
-  },
-
-  h1: {
-    fontSize: "clamp(30px, 4vw, 44px)",
-    lineHeight: 1.1,
-    margin: "12px 0 10px",
-    letterSpacing: -0.6,
-  },
-  h1Sub: {
-    display: "inline-block",
-    marginTop: 8,
-    fontSize: "clamp(16px, 2.2vw, 20px)",
-    fontWeight: 800,
-    color: "rgba(15,23,42,0.75)",
-  },
-
-  gradText: {
-    background: "linear-gradient(135deg, #00B8FF, #7C7CFF)",
-    WebkitBackgroundClip: "text",
-    backgroundClip: "text",
-    color: "transparent",
-  },
-
-  sub: {
-    fontSize: 16,
-    lineHeight: 1.75,
-    color: "rgba(15,23,42,0.72)",
-    maxWidth: 560,
-  },
-
-  heroBtns: { display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" },
-  trust: { display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" },
-  trustItem: {
-    fontSize: 13,
-    padding: "7px 10px",
-    borderRadius: 999,
-    background: "rgba(255,255,255,0.85)",
-    border: "1px solid rgba(15,23,42,0.06)",
-    boxShadow: "0 10px 18px rgba(15,23,42,0.05)",
-    color: "rgba(15,23,42,0.78)",
-  },
-
-  heroCard: {
-    borderRadius: 18,
-    background: "rgba(255,255,255,0.90)",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.08)",
-    overflow: "hidden",
-  },
-  heroCardHead: { padding: 16, borderBottom: "1px solid rgba(15,23,42,0.08)" },
-  heroCardTitle: { fontWeight: 900 },
-  heroCardSub: { fontSize: 12, color: "rgba(15,23,42,0.55)", marginTop: 4 },
-  heroCardBody: { padding: 16, display: "grid", gap: 12 },
-
-  heroImageStrip: {
-    maxWidth: 1120,
-    margin: "16px auto 0",
-    borderRadius: 22,
-    overflow: "hidden",
-    position: "relative",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 44px rgba(15,23,42,0.10)",
-    height: "100%",
-    background: "#EAF2FF",
-  },
-  heroImg: { width: "100%", height: "100%", objectFit: "cover" },
-  heroOverlay: {
-    position: "absolute",
-    left: 16,
-    bottom: 16,
-    padding: "12px 14px",
-    borderRadius: 16,
-    background: "rgba(255,255,255,0.82)",
-    border: "1px solid rgba(15,23,42,0.08)",
-    backdropFilter: "blur(10px)",
-  },
-  overlayTitle: { fontWeight: 900 },
-  overlaySub: { fontSize: 12, color: "rgba(15,23,42,0.7)", marginTop: 3 },
-
-  section: { padding: "34px 16px" },
-  sectionHead: { maxWidth: 1120, margin: "0 auto 14px" },
-  h2: { margin: 0, fontSize: 26, letterSpacing: -0.3 },
-  muted: { margin: "6px 0 0", color: "rgba(15,23,42,0.65)" },
  
 
-  card: {
-    borderRadius: 18,
-    overflow: "hidden",
-    background: "white",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    transition: "transform 0.15s ease",
-  },
-  cardImgWrap: { position: "relative", height: 190, background: "#EAF2FF" },
-  cardImg: { width: "100%", height: "100%", objectFit: "cover" },
-  badge: {
-    position: "absolute",
-    left: 12,
-    top: 12,
-    padding: "6px 10px",
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: 800,
-    color: "#07101F",
-    background:
-      "linear-gradient(135deg, rgba(0,184,255,0.95), rgba(124,124,255,0.95))",
-    boxShadow: "0 12px 24px rgba(0,184,255,0.18)",
-  },
-  cardBody: { padding: 14, display: "grid", gap: 12 },
-  cardTopRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 10,
-    alignItems: "baseline",
-    flexWrap: "wrap",
-  },
-  carName: { fontWeight: 900 },
-  price: { fontWeight: 900 },
-  perDay: { fontSize: 12, color: "rgba(15,23,42,0.6)" },
-  meta: {
-    display: "flex",
-    gap: 10,
-    flexWrap: "wrap",
-    color: "rgba(15,23,42,0.72)",
-    fontSize: 13,
-  },
-
-  steps: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: 12,
-  },
-  stepCard: {
-    borderRadius: 18,
-    background: "white",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    padding: 14,
-  },
-  stepN: { fontWeight: 900, color: "rgba(15,23,42,0.5)", marginBottom: 8 },
-  stepT: { fontWeight: 900, marginBottom: 6 },
-  stepD: { color: "rgba(15,23,42,0.68)", fontSize: 13, lineHeight: 1.6 },
-
-  bookingWrap: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: 14,
-    alignItems: "start",
-  },
-  form: {
-    borderRadius: 18,
-    background: "white",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 44px rgba(15,23,42,0.08)",
-    padding: 16,
-    display: "grid",
-    gap: 12,
-  },
-
-  row2: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: 12,
-  },
-
-  label: { fontSize: 12, fontWeight: 700, color: "rgba(15,23,42,0.7)", marginBottom: 6 },
-
-  input: {
-    width: "100%",
-    padding: "11px 12px",
-    borderRadius: 14,
-    border: "1px solid rgba(15,23,42,0.10)",
-    background: "rgba(247,250,255,0.9)",
-    outline: "none",
-  },
-
-  estimate: {
-    borderRadius: 16,
-    border: "1px solid rgba(15,23,42,0.08)",
-    background: "rgba(247,250,255,0.9)",
-    padding: 12,
-    display: "grid",
-    gap: 8,
-  },
-  estimateRow: { display: "flex", justifyContent: "space-between", gap: 10 },
-  small: { fontSize: 12, color: "rgba(15,23,42,0.6)" },
-
-  formFooter: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-    flexWrap: "wrap",
-  },
-  total: { fontSize: 14, color: "rgba(15,23,42,0.8)" },
-
-  aside: { display: "grid", gap: 12 },
-  asideCard: {
-    borderRadius: 18,
-    background: "white",
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    padding: 14,
-  },
-  asideTitle: { fontWeight: 900, marginBottom: 6 },
-  asideText: { color: "rgba(15,23,42,0.68)", fontSize: 13, lineHeight: 1.6 },
-
-  primaryBtn: {
-    width: "100%",
-    padding: "10px 12px",
-    borderRadius: 14,
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 900,
-    color: "white",
-    background: "linear-gradient(135deg, #00B8FF, #7C7CFF)",
-    boxShadow: "0 14px 30px rgba(0,184,255,0.22)",
-  },
-  primaryBtnLg: {
-    padding: "12px 14px",
-    borderRadius: 14,
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 900,
-    color: "white",
-    background: "linear-gradient(135deg, #00B8FF, #7C7CFF)",
-    boxShadow: "0 14px 30px rgba(0,184,255,0.22)",
-  },
-  primaryBtnSm: {
-    padding: "10px 12px",
-    borderRadius: 14,
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 900,
-    color: "white",
-    background: "linear-gradient(135deg, #00B8FF, #7C7CFF)",
-    boxShadow: "0 14px 30px rgba(0,184,255,0.18)",
-  },
-  secondaryBtn: {
-    padding: "10px 12px",
-    borderRadius: 14,
-    border: "1px solid rgba(15,23,42,0.12)",
-    background: "white",
-    cursor: "pointer",
-    fontWeight: 800,
-    color: "#0B1220",
-    boxShadow: "0 12px 24px rgba(15,23,42,0.06)",
-  },
-
-  footer: {
-    padding: "22px 16px",
-    borderTop: "1px solid rgba(15,23,42,0.08)",
-    background: "rgba(247,250,255,0.7)",
-  },
-  footerInner: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
-  footerTitle: { fontWeight: 900 },
-  footerText: { fontSize: 13, color: "rgba(15,23,42,0.65)" },
-} as const
+function InfoCard({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-5 hover:shadow-lg transition">
+      <div className="font-extrabold">{title}</div>
+      <div className="text-sm text-slate-600 mt-2 leading-relaxed">{text}</div>
+    </div>
+  );
+}
