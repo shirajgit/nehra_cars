@@ -2,11 +2,10 @@
 
 export default function FooterPro({
   brandName = "Nehra Car Rental",
-  phone = "+91 99999 99999",
+  phone = "+91 99928 20332",
   whatsappNumber = "919036692164",
-  email = "info@nehracarrental.com",
-  locationText = "Delhi NCR",
-  mapEmbedSrc = "https://www.google.com/maps?q=Delhi%20NCR&output=embed",
+  email = "info@nehracarrental.com", 
+  mapEmbedSrc = "https://www.google.com/maps/place/Rohtak,+Haryana/@28.8895298,76.5751352,13z/data=!3m1!4b1!4m6!3m5!1s0x390d85a5414251a5:0x9f011cc2777a4544!8m2!3d28.8955152!4d76.606611!16zL20vMDk4MHYz?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D&output=embed",
  
 }) {
   const waLink = `https://wa.me/${whatsappNumber}?text=Hi ${brandName}`;
@@ -14,27 +13,59 @@ export default function FooterPro({
 
   return (
     <>
-      {/* Floating WhatsApp */}
-      <a
-        href={waLink}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-8 right-5 z-50"
-      >
-        <div className="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-full shadow-xl transition hover:scale-105">
-          💬
-        </div>
-      </a>
+    {/* WhatsApp Floating Button */}
+<a
+  href={waLink}
+  target="_blank"
+  rel="noreferrer"
+  className="fixed bottom-6 right-6 z-50 group"
+>
+  <div className="relative flex items-center justify-center w-14 h-14 rounded-full 
+                  bg-gradient-to-br from-green-400 to-green-600 
+                  shadow-2xl shadow-green-400/40
+                  transition duration-300 hover:scale-110">
 
-      {/* Sticky Call */}
-      <a
-        href={callLink}
-        className="fixed bottom-22 right-5 z-50"
-      >
-        <div className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-xl transition hover:scale-105">
-          📞
-        </div>
-      </a>
+    {/* Pulse Ring */}
+    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-30 animate-ping"></span>
+
+    {/* Icon */}
+    <span className="relative text-2xl">💬</span>
+  </div>
+
+  {/* Tooltip */}
+  <span className="absolute right-16 top-1/2 -translate-y-1/2 
+                   bg-black text-white text-xs px-3 py-1 rounded-md 
+                   opacity-0 group-hover:opacity-100 transition">
+    Chat on WhatsApp
+  </span>
+</a>
+
+
+{/* Sticky Call Button */}
+<a
+  href={callLink}
+  className="fixed bottom-24 right-6 z-50 group"
+>
+  <div className="relative flex items-center justify-center w-14 h-14 rounded-full 
+                  bg-gradient-to-br from-blue-500 to-indigo-600 
+                  shadow-2xl shadow-blue-400/40
+                  transition duration-300 hover:scale-110">
+
+    {/* Glow Ring */}
+    <span className="absolute inset-0 rounded-full bg-blue-400/30 blur-xl"></span>
+
+    {/* Icon */}
+    <span className="relative text-2xl">📞</span>
+  </div>
+
+  {/* Tooltip */}
+  <span className="absolute right-16 top-1/2 -translate-y-1/2 
+                   bg-black text-white text-xs px-3 py-1 rounded-md 
+                   opacity-0 group-hover:opacity-100 transition">
+    Call Now
+  </span>
+</a>
+
 
       {/* Footer */}
       <footer className="relative mt-20 bg-gradient-to-br from-blue-50 via-white to-purple-50 border-t border-slate-200">
@@ -61,6 +92,7 @@ export default function FooterPro({
               <li><a href="#booking" className="hover:text-blue-600 transition">Book Now</a></li>
               <li><a href="#" className="hover:text-blue-600 transition">Terms & Conditions</a></li>
               <li><a href="#" className="hover:text-blue-600 transition">Privacy Policy</a></li>
+              <li> <a href="" className="">  </a></li>
             </ul>
           </div>
 
@@ -68,8 +100,8 @@ export default function FooterPro({
           <div>
             <h3 className="font-semibold text-slate-800 mb-4">Contact</h3>
             <ul className="space-y-2 text-sm text-slate-600">
-              <li>📍 {locationText}</li>
-              <li>📞 {phone}</li>
+              <li>📍 Rohtak, Haryana</li>
+              <li>📞 +91 99928 20332</li>
               <li>✉️ {email}</li>
             </ul>
           </div>

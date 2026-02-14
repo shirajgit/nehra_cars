@@ -180,221 +180,347 @@ export default function App() {
       />
 
       {/* Cars */}
-      <section id="cars" className="px-4 py-12">
-        <div className="max-w-7xl mx-auto mb-6">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Available Cars</h2>
-          <p className="text-slate-600 mt-2">
-            Demo listings. We’ll replace with your real cars, pricing & photos.
-          </p>
+     <section
+  id="cars"
+  className="relative px-4 py-16 bg-gradient-to-b from-white via-sky-50/40 to-white overflow-hidden"
+>
+  {/* Background Glow */}
+  <div className="absolute -top-32 -left-32 w-[400px] h-[400px] bg-sky-400/10 blur-[120px] rounded-full"></div>
+  <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] bg-indigo-400/10 blur-[120px] rounded-full"></div>
+
+  <div className="relative max-w-7xl mx-auto mb-10 text-center">
+    <motion.h2
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="text-3xl md:text-4xl font-extrabold tracking-tight"
+    >
+      Available Cars
+    </motion.h2>
+
+    <motion.p
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      viewport={{ once: true }}
+      className="text-slate-600 mt-3"
+    >
+      Choose your ride and book instantly. Premium quality, transparent pricing.
+    </motion.p>
+  </div>
+
+  {/* Grid */}
+  <div className="relative max-w-7xl mx-auto grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {CARS.map((car, index) => (
+      <motion.div
+        key={car.id}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.08 }}
+        viewport={{ once: true }}
+        className="group rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+      >
+        {/* Image */}
+        <div className="relative h-52 bg-slate-100 overflow-hidden">
+          <img
+            src={car.img}
+            alt={car.name}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+            loading="lazy"
+          />
+
+          {/* Tag */}
+          <span className="absolute left-4 top-4 text-xs font-bold px-3 py-1 rounded-full text-white
+            bg-gradient-to-r from-sky-500 to-indigo-600 shadow-lg">
+            {car.tag}
+          </span>
+
+          {/* Price floating badge */}
+          <div className="absolute right-4 bottom-4 bg-white/90 backdrop-blur border border-slate-200 rounded-xl px-3 py-1 shadow-md text-sm font-bold">
+            {formatINR(car.pricePerDay)}{" "}
+            <span className="text-xs text-slate-500">/day</span>
+          </div>
         </div>
 
-        {/* ✅ lg=3 columns */}
-        <div className="max-w-7xl mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {CARS.map((car) => (
-            <div
-              key={car.id}
-              className="group rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-xl transition"
-            >
-              <div className="relative h-48 bg-slate-100 overflow-hidden">
-                <img
-                  src={car.img}
-                  alt={car.name}
-                  className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-300"
-                  loading="lazy"
-                />
-                <span className="absolute left-3 top-3 text-xs font-extrabold px-3 py-1 rounded-full text-white
-                  bg-gradient-to-r from-sky-500 to-indigo-500 shadow">
-                  {car.tag}
-                </span>
-              </div>
+        {/* Content */}
+        <div className="p-5 grid gap-4">
+          <div className="font-extrabold text-lg">{car.name}</div>
 
-              <div className="p-4 grid gap-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="font-extrabold">{car.name}</div>
-                  <div className="font-extrabold">
-                    {formatINR(car.pricePerDay)} <span className="text-xs text-slate-500">/day</span>
-                  </div>
-                </div>
+          <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+            <span>👤 {car.seats} Seats</span>
+            <span>⛽ {car.fuel}</span>
+            <span>⚙️ {car.transmission}</span>
+          </div>
 
-                <div className="flex flex-wrap gap-3 text-sm text-slate-700">
-                  <span>👤 {car.seats} Seats</span>
-                  <span>⛽ {car.fuel}</span>
-                  <span>⚙️ {car.transmission}</span>
-                </div>
-
-                <button
-                  onClick={() => bookThisCar(car.id)}
-                  className="w-full rounded-xl px-4 py-3 font-extrabold text-white
-                    bg-gradient-to-r from-sky-500 to-indigo-500
-                    hover:opacity-95 active:scale-[0.99] transition shadow-md"
-                >
-                  Book this car →
-                </button>
-              </div>
-            </div>
-          ))}
+          <button
+            onClick={() => bookThisCar(car.id)}
+            className="w-full rounded-xl px-4 py-3 font-extrabold text-white
+              bg-gradient-to-r from-sky-500 to-indigo-600
+              shadow-lg hover:scale-105 transition duration-300"
+          >
+            Book this car →
+          </button>
         </div>
-      </section>
+      </motion.div>
+    ))}
+  </div>
+</section>
+
 
       {/* How it works */}
-      <section id="how" className="px-4 pb-4">
-        <div className="max-w-7xl mx-auto mb-6">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">How it works</h2>
-          <p className="text-slate-600 mt-2">Fast booking, instant WhatsApp confirmation.</p>
+     <section
+  id="how"
+  className="relative px-4 py-16 bg-gradient-to-b from-white via-indigo-50/40 to-white overflow-hidden"
+>
+  {/* Glow */}
+  <div className="absolute -top-32 -right-32 w-[420px] h-[420px] bg-indigo-400/10 blur-[120px] rounded-full" />
+  <div className="absolute -bottom-32 -left-32 w-[420px] h-[420px] bg-sky-400/10 blur-[120px] rounded-full" />
+
+  <div className="relative max-w-7xl mx-auto mb-10 text-center">
+    <motion.h2
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="text-3xl md:text-4xl font-extrabold tracking-tight"
+    >
+      How it works
+    </motion.h2>
+
+    <motion.p
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      viewport={{ once: true }}
+      className="text-slate-600 mt-3"
+    >
+      Fast booking, instant WhatsApp confirmation.
+    </motion.p>
+  </div>
+
+  {/* Steps */}
+  <motion.div
+    initial="hidden"
+    whileInView="show"
+    viewport={{ once: true }}
+    variants={{
+      hidden: { opacity: 0 },
+      show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+    }}
+    className="relative max-w-7xl mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+  >
+    {[
+      { n: "01", t: "Choose a car", d: "Pick the car that fits your trip and budget.", icon: "🚗" },
+      { n: "02", t: "Fill booking details", d: "Pickup, drop dates and your location.", icon: "📝" },
+      { n: "03", t: "WhatsApp confirmation", d: "We receive your request instantly on WhatsApp.", icon: "💬" },
+      { n: "04", t: "Pickup & drive", d: "Complete verification and enjoy your ride.", icon: "✅" },
+    ].map((s) => (
+      <motion.div
+        key={s.n}
+        variants={{
+          hidden: { opacity: 0, y: 30 },
+          show: { opacity: 1, y: 0 },
+        }}
+        className="group relative rounded-3xl bg-white border border-slate-200 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 p-6 overflow-hidden"
+      >
+        {/* top glow strip */}
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-500 to-indigo-600" />
+
+        {/* Number + Icon */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-extrabold px-3 py-1 rounded-full text-white bg-gradient-to-r from-sky-500 to-indigo-600 shadow-md">
+            Step {s.n}
+          </span>
+
+          <span className="w-11 h-11 grid place-items-center rounded-2xl bg-slate-50 border border-slate-200 shadow-sm text-xl group-hover:scale-110 transition duration-300">
+            {s.icon}
+          </span>
         </div>
 
-        <div className="max-w-7xl mx-auto grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { n: "01", t: "Choose a car", d: "Pick the car that fits your trip and budget." },
-            { n: "02", t: "Fill booking details", d: "Pickup, drop dates and your location." },
-            { n: "03", t: "WhatsApp confirmation", d: "We receive your request instantly on WhatsApp." },
-            { n: "04", t: "Pickup & drive", d: "Complete verification and enjoy your ride." },
-          ].map((s) => (
-            <div key={s.n} className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 hover:shadow-lg transition">
-              <div className="text-slate-500 font-extrabold">{s.n}</div>
-              <div className="mt-2 font-extrabold">{s.t}</div>
-              <div className="mt-2 text-sm text-slate-600 leading-relaxed">{s.d}</div>
-            </div>
-          ))}
+        <div className="mt-4 font-extrabold text-lg">{s.t}</div>
+        <div className="mt-2 text-sm text-slate-600 leading-relaxed">
+          {s.d}
         </div>
-      </section>
+
+        {/* subtle background decoration */}
+        <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-indigo-500/5 blur-2xl" />
+      </motion.div>
+    ))}
+  </motion.div>
+</section>
+
 
       {/* Booking */}
-      <section id="booking" className="px-4 py-12">
-        <div className="max-w-7xl mx-auto mb-6">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Booking Request</h2>
-          <p className="text-slate-600 mt-2">Submit → it will open WhatsApp with all booking details.</p>
+     <section
+  id="booking"
+  className="relative px-4 py-20 bg-gradient-to-b from-white via-sky-50/40 to-white overflow-hidden"
+>
+  {/* Background Glow */}
+  <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-indigo-400/10 blur-[120px] rounded-full"></div>
+  <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-sky-400/10 blur-[120px] rounded-full"></div>
+
+  <div className="relative max-w-7xl mx-auto mb-10 text-center">
+    <motion.h2
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="text-3xl md:text-4xl font-extrabold tracking-tight"
+    >
+      Booking Request
+    </motion.h2>
+
+    <p className="text-slate-600 mt-3">
+      Submit → it will open WhatsApp with all booking details.
+    </p>
+  </div>
+
+  <div className="relative max-w-7xl mx-auto grid gap-8 lg:grid-cols-[1fr_0.42fr] items-start">
+
+    {/* FORM */}
+    <motion.form
+      onSubmit={handleSubmit}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="rounded-3xl bg-white/90 backdrop-blur-xl border border-slate-200 shadow-xl p-8 grid gap-6"
+    >
+      {/* Row 1 */}
+      <div className="grid gap-5 md:grid-cols-2">
+        <Field label="Full Name">
+          <input
+            className="inputStyle"
+            placeholder="Your name"
+            value={form.name}
+            onChange={onChange("name")}
+          />
+        </Field>
+
+        <Field label="Phone (10 digits)">
+          <input
+            className="inputStyle"
+            placeholder="9876543210"
+            inputMode="numeric"
+            value={form.phone}
+            onChange={onChange("phone")}
+          />
+        </Field>
+      </div>
+
+      <Field label="Select Car">
+        <select
+          className="inputStyle"
+          value={selectedCarId}
+          onChange={(e) => setSelectedCarId(e.target.value)}
+        >
+          {CARS.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} • {formatINR(c.pricePerDay)}/day
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      {/* Dates */}
+      <div className="grid gap-5 md:grid-cols-2">
+        <Field label="Pickup Date">
+          <input
+            className="inputStyle"
+            type="date"
+            value={form.pickupDate}
+            onChange={onChange("pickupDate")}
+          />
+        </Field>
+
+        <Field label="Drop Date">
+          <input
+            className="inputStyle"
+            type="date"
+            value={form.dropDate}
+            onChange={onChange("dropDate")}
+          />
+        </Field>
+      </div>
+
+      <Field label="Pickup Location">
+        <input
+          className="inputStyle"
+          placeholder="Airport / Railway Station / City"
+          value={form.pickupLocation}
+          onChange={onChange("pickupLocation")}
+        />
+      </Field>
+
+      <Field label="Notes (optional)">
+        <textarea
+          className="inputStyle min-h-[110px]"
+          placeholder="Any special request?"
+          value={form.note}
+          onChange={onChange("note")}
+        />
+      </Field>
+
+      {/* Estimate + Button */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-gradient-to-r from-sky-50 to-indigo-50 p-6">
+        <div>
+          <div className="text-sm text-slate-700">
+            Estimated Total:{" "}
+            <span className="text-lg font-extrabold text-indigo-600">
+              {estTotal ? formatINR(estTotal) : "-"}
+            </span>
+          </div>
+          <div className="text-xs text-slate-500 mt-1">
+            (Estimate: days × price/day)
+          </div>
         </div>
 
-        <div className="max-w-7xl mx-auto grid gap-5 lg:grid-cols-[1fr_0.42fr] items-start">
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-2xl bg-white border border-slate-200 shadow-sm p-5 grid gap-4"
-          >
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Full Name">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  placeholder="Your name"
-                  value={form.name}
-                  onChange={onChange("name")}
-                />
-              </Field>
-              <Field label="Phone (10 digits)">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  placeholder="9876543210"
-                  inputMode="numeric"
-                  value={form.phone}
-                  onChange={onChange("phone")}
-                />
-              </Field>
-            </div>
+        <button
+          type="submit"
+          className="px-7 py-3 rounded-xl font-extrabold text-white
+            bg-gradient-to-r from-sky-500 to-indigo-600
+            shadow-lg hover:scale-105 transition duration-300"
+        >
+          Submit on WhatsApp →
+        </button>
+      </div>
+    </motion.form>
 
-            <Field label="Select Car">
-              <select
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                value={selectedCarId}
-                onChange={(e) => setSelectedCarId(e.target.value)}
-              >
-                {CARS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} • {formatINR(c.pricePerDay)}/day
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Pickup Date">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  type="date"
-                  value={form.pickupDate}
-                  onChange={onChange("pickupDate")}
-                />
-              </Field>
-              <Field label="Pickup Time">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  type="time"
-                  value={form.pickupTime}
-                  onChange={onChange("pickupTime")}
-                />
-              </Field>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Drop Date">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  type="date"
-                  value={form.dropDate}
-                  onChange={onChange("dropDate")}
-                />
-              </Field>
-              <Field label="Drop Time">
-                <input
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                  type="time"
-                  value={form.dropTime}
-                  onChange={onChange("dropTime")}
-                />
-              </Field>
-            </div>
-
-            <Field label="Pickup Location">
-              <input
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                placeholder="e.g., Airport / Railway Station / City"
-                value={form.pickupLocation}
-                onChange={onChange("pickupLocation")}
-              />
-            </Field>
-
-            <Field label="Notes (optional)">
-              <textarea
-                className="w-full min-h-[90px] rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 outline-none focus:ring-2 focus:ring-sky-200"
-                placeholder="Any special request?"
-                value={form.note}
-                onChange={onChange("note")}
-              />
-            </Field>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <div>
-                <div className="text-sm text-slate-700">
-                  Estimated Total: <b>{estTotal ? formatINR(estTotal) : "-"}</b>
-                </div>
-                <div className="text-xs text-slate-500 mt-1">(Estimate: days × price/day)</div>
-              </div>
-
-              <button
-                type="submit"
-                className="rounded-xl px-5 py-3 font-extrabold text-white
-                  bg-gradient-to-r from-sky-500 to-indigo-500
-                  hover:opacity-95 active:scale-[0.99] transition shadow-md"
-              >
-                Submit on WhatsApp
-              </button>
-            </div>
-          </form>
-
-          <aside className="grid gap-4">
-            <InfoCard title="Service Area" text="Delhi NCR (Demo)" />
-            <InfoCard title="Documents" text="Driving License + ID Proof" />
-            <InfoCard title="Instant Support" text="WhatsApp & Call buttons available on screen." />
-          </aside>
+    {/* ASIDE */}
+    <motion.aside
+      initial={{ opacity: 0, x: 40 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="grid gap-5"
+    >
+      {[
+        { title: "Service Area", text: "Delhi NCR" },
+        { title: "Documents Required", text: "Driving License + ID Proof" },
+        { title: "Instant Support", text: "WhatsApp & Call buttons available." },
+      ].map((card) => (
+        <div
+          key={card.title}
+          className="rounded-3xl bg-white border border-slate-200 shadow-md p-6 hover:shadow-xl transition"
+        >
+          <div className="font-extrabold text-lg">{card.title}</div>
+          <div className="text-slate-600 mt-2 text-sm leading-relaxed">
+            {card.text}
+          </div>
         </div>
-      </section>
+      ))}
+    </motion.aside>
+  </div>
+</section>
+
 
       {/* ✅ Light Footer component */}
       <FooterPro
         brandName="Nehra Car Rental"
         phone="+91 99999 99999"
         whatsappNumber={DEMO_WHATSAPP_NUMBER}
-        email="info@nehracarrental.com"
-        locationText="Delhi NCR"
+        email="info@nehracarrental.com"  
         mapEmbedSrc="https://www.google.com/maps?q=Delhi%20NCR&output=embed"
      
       />
@@ -403,37 +529,91 @@ export default function App() {
 }
 
 /* ---------- Small components ---------- */
+ 
 
-function Topbar({ onCars, onBook }: { onCars: () => void; onBook: () => void }) {
+function Topbar({
+  onCars,
+  onBook,
+}: {
+  onCars: () => void;
+  onBook: () => void;
+}) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/90 backdrop-blur-lg shadow-md border-b border-slate-200"
+          : "bg-white/70 backdrop-blur border-b border-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="h-12 w-14 rounded-xl" />
-          <div>
-            <div className="font-extrabold">Nehra Car Rental</div>
-            <div className="text-xs text-slate-600">Self Drive • Instant Booking</div>
-          </div>
-        </div>
 
-        <div className="flex gap-2 flex-wrap">
+        {/* Logo Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-3 cursor-pointer"
+        >
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="h-12 w-14 rounded-xl shadow-sm"
+          />
+          <div>
+            <div className="font-extrabold text-lg tracking-tight">
+              Nehra Car Rental
+            </div>
+            <div className="text-xs text-slate-600">
+              Self Drive • Instant Booking
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Buttons */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex gap-3 flex-wrap"
+        >
           <button
             onClick={onCars}
-            className="rounded-xl px-4 py-2 font-bold border border-slate-200 bg-white hover:bg-slate-50 transition"
+            className="relative px-5 py-2 rounded-xl font-semibold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition group"
           >
             View Cars
+            <span className="absolute left-4 bottom-1 h-[2px] w-0 bg-sky-500 transition-all duration-300 group-hover:w-6"></span>
           </button>
+
           <button
             onClick={onBook}
-            className="rounded-xl px-4 py-2 font-extrabold text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:opacity-95 transition"
+            className="px-6 py-2 rounded-xl font-extrabold text-white 
+                       bg-gradient-to-r from-sky-500 to-indigo-600 
+                       shadow-lg shadow-sky-400/30 
+                       hover:scale-105 hover:shadow-xl 
+                       transition duration-300"
           >
             Book Now
           </button>
-        </div>
+        </motion.div>
       </div>
     </header>
   );
 }
+
+ 
+
+
 function Hero({
  
   onExplore,
@@ -484,7 +664,7 @@ function Hero({
           <h1 className="mt-6 text-[clamp(32px,4vw,48px)] font-extrabold leading-tight tracking-tight">
             Premium Car Rentals in{" "}
             <span className="bg-gradient-to-r from-sky-500 to-indigo-600 bg-clip-text text-transparent">
-              Delhi NCR
+            All Over Haryana
             </span>
           </h1>
 
@@ -556,12 +736,4 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
  
-
-function InfoCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-5 hover:shadow-lg transition">
-      <div className="font-extrabold">{title}</div>
-      <div className="text-sm text-slate-600 mt-2 leading-relaxed">{text}</div>
-    </div>
-  );
-}
+ 
