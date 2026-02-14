@@ -409,7 +409,7 @@ function Topbar({ onCars, onBook }: { onCars: () => void; onBook: () => void }) 
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="h-11 w-auto rounded-xl" />
+          <img src="/logo.png" alt="Logo" className="h-12 w-14 rounded-xl" />
           <div>
             <div className="font-extrabold">Nehra Car Rental</div>
             <div className="text-xs text-slate-600">Self Drive • Instant Booking</div>

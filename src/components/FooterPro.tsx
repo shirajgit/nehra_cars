@@ -1,4 +1,4 @@
-import React from "react";
+ 
 
 export default function FooterPro({
   brandName = "Nehra Car Rental",
